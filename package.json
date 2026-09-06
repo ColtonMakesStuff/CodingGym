@@ -1,0 +1,17 @@
+{
+  "name": "coding-gym",
+  "version": "1.0.0",
+  "description": "Challenge yourself using AI-generated coding problems",
+  "type": "commonjs",
+  "scripts": {
+    "generate": "node scripts/generate.js",
+    "gym": "node scripts/generate.js",
+    "gym:test": "node scripts/generate.js test",
+    "gym:solve": "node scripts/generate.js solve",
+    "gym:show": "node scripts/generate.js show"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "openai": "^5.19.1"
+  }
+}

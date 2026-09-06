@@ -1,0 +1,16 @@
+Environment variables
+
+.env
+.env.*
+
+Dependencies
+
+node_modules/
+
+Ignore everything inside coding-gym
+
+coding-gym/
+
+macOS
+
+.DS_Store
