@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
-const { spawnSync } = require('child_process');
-const OpenAI = require('openai');
-require('dotenv').config();
+const fs = require("fs");
+const path = require("path");
+const readline = require("readline");
+const { spawnSync } = require("child_process");
+const OpenAI = require("openai");
+require("dotenv").config();
 
 /*
 |--------------------------------------------------------------------------
@@ -13,25 +13,23 @@ require('dotenv').config();
 
 const ROOT = process.cwd();
 
-const GYM_DIR = path.join(ROOT, 'coding-gym');
-const INPUT_FILE = path.join(GYM_DIR, 'input.js');
-const TEST_FILE = path.join(GYM_DIR, 'test.js');
-const PROBLEM_FILE = path.join(GYM_DIR, 'problem.md');
+const GYM_DIR = path.join(ROOT, "coding-gym");
+const INPUT_FILE = path.join(GYM_DIR, "input.js");
+const TEST_FILE = path.join(GYM_DIR, "test.js");
+const PROBLEM_FILE = path.join(GYM_DIR, "problem.md");
 
-const TEMP_DIR = path.join(GYM_DIR, '.validation');
-const REFERENCE_FILE = path.join(TEMP_DIR, 'solution.js');
+const TEMP_DIR = path.join(GYM_DIR, ".validation");
+const REFERENCE_FILE = path.join(TEMP_DIR, "solution.js");
 
-const HISTORY_DIR = path.join(GYM_DIR, 'history');
+const HISTORY_DIR = path.join(GYM_DIR, "history");
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error(
-    'OPENAI_API_KEY is not set. Add OPENAI_API_KEY=... to your .env file.'
+    "OPENAI_API_KEY is not set. Add OPENAI_API_KEY=... to your .env file.",
   );
 }
 if (!process.env.THEME) {
-  throw new Error(
-    'THEME is not set. Add THEME=... to your .env file.'
-  );
+  throw new Error("THEME is not set. Add THEME=... to your .env file.");
 }
 
 const client = new OpenAI({
@@ -59,62 +57,61 @@ function askQuestion(question) {
 }
 
 async function askDifficulty() {
-  console.log('');
-  console.log('Choose a difficulty:');
-  console.log('');
-  console.log('  1. Easy');
-  console.log('  2. Medium');
-  console.log('  3. Hard');
-  console.log('');
+  console.log("");
+  console.log("Choose a difficulty:");
+  console.log("");
+  console.log("  1. Easy");
+  console.log("  2. Medium");
+  console.log("  3. Hard");
+  console.log("");
 
   while (true) {
-    const answer = await askQuestion('> ');
+    const answer = await askQuestion("> ");
 
     switch (answer.trim().toLowerCase()) {
-      case '1':
-      case 'easy':
-        return 'easy';
+      case "1":
+      case "easy":
+        return "easy";
 
-      case '2':
-      case 'medium':
-        return 'medium';
+      case "2":
+      case "medium":
+        return "medium";
 
-      case '3':
-      case 'hard':
-        return 'hard';
+      case "3":
+      case "hard":
+        return "hard";
 
       default:
-        console.log('Please choose 1, 2, or 3.');
+        console.log("Please choose 1, 2, or 3.");
     }
   }
 }
 
 async function askHints() {
-  console.log('');
-  console.log('Generate hints?');
-  console.log('');
-  console.log('  y. Yes');
-  console.log('  n. No');
-  console.log('');
+  console.log("");
+  console.log("Generate hints?");
+  console.log("");
+  console.log("  y. Yes");
+  console.log("  n. No");
+  console.log("");
 
   while (true) {
-    const answer = await askQuestion('> ');
+    const answer = await askQuestion("> ");
 
     switch (answer.trim().toLowerCase()) {
-      case 'y':
-      case 'yes':
+      case "y":
+      case "yes":
         return true;
 
-      case 'n':
-      case 'no':
+      case "n":
+      case "no":
         return false;
 
       default:
-        console.log('Please enter y or n.');
+        console.log("Please enter y or n.");
     }
   }
 }
-
 
 function hasFlag(name) {
   return process.argv.includes(name);
@@ -199,8 +196,8 @@ function getToday() {
   const now = new Date();
 
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 }
@@ -215,22 +212,14 @@ function readJson(filePath, fallback) {
   }
 
   try {
-    return JSON.parse(
-      fs.readFileSync(filePath, 'utf8')
-    );
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch (error) {
-    throw new Error(
-      `Could not parse JSON file: ${filePath}\n${error.message}`
-    );
+    throw new Error(`Could not parse JSON file: ${filePath}\n${error.message}`);
   }
 }
 
 function writeJson(filePath, value) {
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(value, null, 2) + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + "\n", "utf8");
 }
 
 function createEmptyHistory() {
@@ -253,19 +242,13 @@ function loadTodayHistory() {
     return history;
   }
 
-  return readJson(
-    historyPath,
-    createEmptyHistory()
-  );
+  return readJson(historyPath, createEmptyHistory());
 }
 
 function saveTodayHistory(history) {
   ensureDirectories();
 
-  writeJson(
-    getHistoryPath(),
-    history
-  );
+  writeJson(getHistoryPath(), history);
 }
 
 /*
@@ -276,13 +259,13 @@ function saveTodayHistory(history) {
 
 function cleanGeneratedText(text) {
   if (!text) {
-    return '';
+    return "";
   }
 
   return text
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/\s*```$/i, '')
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "")
     .trim();
 }
 
@@ -292,27 +275,17 @@ function extractJson(text) {
   try {
     return JSON.parse(cleaned);
   } catch (_) {
-    const start = cleaned.indexOf('{');
-    const end = cleaned.lastIndexOf('}');
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
 
-    if (
-      start === -1 ||
-      end === -1 ||
-      end <= start
-    ) {
-      throw new Error(
-        'AI response did not contain valid JSON.'
-      );
+    if (start === -1 || end === -1 || end <= start) {
+      throw new Error("AI response did not contain valid JSON.");
     }
 
     try {
-      return JSON.parse(
-        cleaned.slice(start, end + 1)
-      );
+      return JSON.parse(cleaned.slice(start, end + 1));
     } catch (error) {
-      throw new Error(
-        `Could not parse AI-generated JSON: ${error.message}`
-      );
+      throw new Error(`Could not parse AI-generated JSON: ${error.message}`);
     }
   }
 }
@@ -324,57 +297,40 @@ function extractJson(text) {
 */
 
 function validateGeneratedProblem(problem) {
-  const requiredFields = [
-    'problem',
-    'input',
-    'test',
-    'solution',
-  ];
+  const requiredFields = ["problem", "input", "test", "solution"];
 
   for (const field of requiredFields) {
-    if (
-      typeof problem[field] !== 'string' ||
-      !problem[field].trim()
-    ) {
-      throw new Error(
-        `AI response is missing required field: ${field}`
-      );
+    if (typeof problem[field] !== "string" || !problem[field].trim()) {
+      throw new Error(`AI response is missing required field: ${field}`);
     }
   }
 
   if (!problem.problemId) {
-    problem.problemId =
-      `problem-${Date.now()}`;
+    problem.problemId = `problem-${Date.now()}`;
   }
 
   if (!problem.title) {
-    problem.title = 'Coding Exercise';
+    problem.title = "Coding Exercise";
   }
 
   if (!problem.difficulty) {
-    problem.difficulty = 'unknown';
+    problem.difficulty = "unknown";
   }
 
   return problem;
 }
 
 function validateJavaScript(contents, filename) {
-  const result = spawnSync(
-    process.execPath,
-    ['--check'],
-    {
-      input: contents,
-      encoding: 'utf8',
-    }
-  );
+  const result = spawnSync(process.execPath, ["--check"], {
+    input: contents,
+    encoding: "utf8",
+  });
 
   if (result.status !== 0) {
     throw new Error(
       `AI generated invalid JavaScript for ${filename}:\n\n${
-        result.stderr ||
-        result.stdout ||
-        'Unknown syntax error.'
-      }`
+        result.stderr || result.stdout || "Unknown syntax error."
+      }`,
     );
   }
 }
@@ -396,17 +352,9 @@ function prepareValidationFiles(problem) {
    * We copy the user's starter code into the normal
    * input.js location temporarily.
    */
-  fs.writeFileSync(
-    INPUT_FILE,
-    problem.input.trim() + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(INPUT_FILE, problem.input.trim() + "\n", "utf8");
 
-  fs.writeFileSync(
-    TEST_FILE,
-    problem.test.trim() + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(TEST_FILE, problem.test.trim() + "\n", "utf8");
 
   /*
    * The reference solution is temporary.
@@ -414,30 +362,19 @@ function prepareValidationFiles(problem) {
    * It will NEVER be left in the final coding-gym
    * directory.
    */
-  fs.writeFileSync(
-    REFERENCE_FILE,
-    problem.solution.trim() + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(REFERENCE_FILE, problem.solution.trim() + "\n", "utf8");
 }
 
 function runNodeTests(testFile) {
-  const result = spawnSync(
-    process.execPath,
-    ['--test', testFile],
-    {
-      cwd: ROOT,
-      encoding: 'utf8',
-    }
-  );
+  const result = spawnSync(process.execPath, ["--test", testFile], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
 
   return {
     passed: result.status === 0,
     status: result.status,
-    output: [
-      result.stdout || '',
-      result.stderr || '',
-    ].join('\n'),
+    output: [result.stdout || "", result.stderr || ""].join("\n"),
   };
 }
 
@@ -451,28 +388,18 @@ function buildReferenceTestFile(problem) {
    */
   return problem.test.replace(
     /require\(\s*['"]\.\/input['"]\s*\)/g,
-    `require(${JSON.stringify(REFERENCE_FILE)})`
+    `require(${JSON.stringify(REFERENCE_FILE)})`,
   );
 }
 
 function validateReferenceSolution(problem) {
-  const referenceTestFile = path.join(
-    TEMP_DIR,
-    'reference-test.js'
-  );
+  const referenceTestFile = path.join(TEMP_DIR, "reference-test.js");
 
-  const referenceTests =
-    buildReferenceTestFile(problem);
+  const referenceTests = buildReferenceTestFile(problem);
 
-  fs.writeFileSync(
-    referenceTestFile,
-    referenceTests,
-    'utf8'
-  );
+  fs.writeFileSync(referenceTestFile, referenceTests, "utf8");
 
-  const result = runNodeTests(
-    referenceTestFile
-  );
+  const result = runNodeTests(referenceTestFile);
 
   if (!result.passed) {
     return {
@@ -488,9 +415,7 @@ function validateReferenceSolution(problem) {
 }
 
 function validateStarterSolution() {
-  const result = runNodeTests(
-    TEST_FILE
-  );
+  const result = runNodeTests(TEST_FILE);
 
   /*
    * We WANT the starter solution to fail.
@@ -502,8 +427,8 @@ function validateStarterSolution() {
     return {
       valid: false,
       output:
-        'The starter input.js passed every test. ' +
-        'The generated exercise does not provide a challenge.',
+        "The starter input.js passed every test. " +
+        "The generated exercise does not provide a challenge.",
     };
   }
 
@@ -521,8 +446,8 @@ function validateStarterSolution() {
     /TypeError.*is not a function/i,
   ];
 
-  const isBroken = brokenPatterns.some(
-    (pattern) => pattern.test(result.output)
+  const isBroken = brokenPatterns.some((pattern) =>
+    pattern.test(result.output),
   );
 
   if (isBroken) {
@@ -539,26 +464,17 @@ function validateStarterSolution() {
 }
 
 function validateGeneratedProblemCompletely(problem) {
-  console.log('');
-  console.log('Validating generated exercise...');
+  console.log("");
+  console.log("Validating generated exercise...");
 
   /*
    * First validate all generated JavaScript syntax.
    */
-  validateJavaScript(
-    problem.input,
-    'input.js'
-  );
+  validateJavaScript(problem.input, "input.js");
 
-  validateJavaScript(
-    problem.test,
-    'test.js'
-  );
+  validateJavaScript(problem.test, "test.js");
 
-  validateJavaScript(
-    problem.solution,
-    'reference solution'
-  );
+  validateJavaScript(problem.solution, "reference solution");
 
   /*
    * Prepare temporary files.
@@ -568,52 +484,40 @@ function validateGeneratedProblemCompletely(problem) {
   /*
    * The reference implementation MUST pass.
    */
-  console.log(
-    '  Checking reference solution...'
-  );
+  console.log("  Checking reference solution...");
 
-  const reference =
-    validateReferenceSolution(problem);
+  const reference = validateReferenceSolution(problem);
 
   if (!reference.valid) {
     return {
       valid: false,
-      reason:
-        'The reference solution does not pass its own tests.',
+      reason: "The reference solution does not pass its own tests.",
       output: reference.output,
     };
   }
 
-  console.log(
-    '  ✓ Reference solution passes all tests.'
-  );
+  console.log("  ✓ Reference solution passes all tests.");
 
   /*
    * The starter implementation MUST fail.
    */
-  console.log(
-    '  Checking starter solution...'
-  );
+  console.log("  Checking starter solution...");
 
-  const starter =
-    validateStarterSolution();
+  const starter = validateStarterSolution();
 
   if (!starter.valid) {
     return {
       valid: false,
-      reason:
-        'The starter solution does not behave as expected.',
+      reason: "The starter solution does not behave as expected.",
       output: starter.output,
     };
   }
 
-  console.log(
-    '  ✓ Starter solution fails as expected.'
-  );
+  console.log("  ✓ Starter solution fails as expected.");
 
   return {
     valid: true,
-    output: '',
+    output: "",
   };
 }
 
@@ -626,23 +530,11 @@ function validateGeneratedProblemCompletely(problem) {
 function writeGeneratedFiles(problem) {
   ensureDirectories();
 
-  fs.writeFileSync(
-    PROBLEM_FILE,
-    problem.problem.trim() + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(PROBLEM_FILE, problem.problem.trim() + "\n", "utf8");
 
-  fs.writeFileSync(
-    INPUT_FILE,
-    problem.input.trim() + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(INPUT_FILE, problem.input.trim() + "\n", "utf8");
 
-  fs.writeFileSync(
-    TEST_FILE,
-    problem.test.trim() + '\n',
-    'utf8'
-  );
+  fs.writeFileSync(TEST_FILE, problem.test.trim() + "\n", "utf8");
 }
 
 /*
@@ -662,51 +554,35 @@ function cleanupAfterGeneration() {
 */
 
 function updatePackageJson() {
-  const packagePath =
-    path.join(ROOT, 'package.json');
+  const packagePath = path.join(ROOT, "package.json");
 
   if (!fs.existsSync(packagePath)) {
     return;
   }
 
-  const packageJson =
-    readJson(packagePath, {});
+  const packageJson = readJson(packagePath, {});
 
-  packageJson.scripts =
-    packageJson.scripts || {};
+  packageJson.scripts = packageJson.scripts || {};
 
   const scriptPath = path.relative(
     ROOT,
-    path.join(
-      ROOT,
-      'scripts',
-      path.basename(__filename)
-    )
+    path.join(ROOT, "scripts", path.basename(__filename)),
   );
 
-  const normalizedScriptPath =
-    scriptPath.split(path.sep).join('/');
+  const normalizedScriptPath = scriptPath.split(path.sep).join("/");
 
-  packageJson.scripts.gym =
-    `node ${normalizedScriptPath}`;
+  packageJson.scripts.gym = `node ${normalizedScriptPath}`;
 
-  packageJson.scripts['gym:test'] =
-    `node ${normalizedScriptPath} test`;
+  packageJson.scripts["gym:test"] = `node ${normalizedScriptPath} test`;
 
-  packageJson.scripts['gym:solve'] =
-    `node ${normalizedScriptPath} solve`;
+  packageJson.scripts["gym:solve"] = `node ${normalizedScriptPath} solve`;
 
-  packageJson.scripts['gym:show'] =
-    `node ${normalizedScriptPath} show`;
+  packageJson.scripts["gym:show"] = `node ${normalizedScriptPath} show`;
 
   fs.writeFileSync(
     packagePath,
-    JSON.stringify(
-      packageJson,
-      null,
-      2
-    ) + '\n',
-    'utf8'
+    JSON.stringify(packageJson, null, 2) + "\n",
+    "utf8",
   );
 }
 
@@ -716,30 +592,21 @@ function updatePackageJson() {
 |--------------------------------------------------------------------------
 */
 
-function buildGenerationPrompt({
-  hints,
-  previousHistory,
-  difficulty
-}) {
-
-  const difficultyExplanation =
-    difficulty
-      ? `The difficulty level is "${difficulty}".`
-      : 'The difficulty level is not specified.';
+function buildGenerationPrompt({ hints, previousHistory, difficulty }) {
+  const difficultyExplanation = difficulty
+    ? `The difficulty level is "${difficulty}".`
+    : "The difficulty level is not specified.";
 
   const difficultyDefinitions = {
-    easy: 'Easy problems should be solvable in 10-15 minutes by a beginner to intermediate JavaScript developer. They should focus on basic programming concepts, data structures, and algorithms without requiring advanced knowledge or complex logic.',
-    medium: 'Medium problems should be solvable in 15-30 minutes by an intermediate JavaScript developer. They may involve more complex logic, multiple steps, and a deeper understanding of JavaScript features and data structures.',
-    hard: 'Hard problems should be solvable in 30-60 minutes by an experienced JavaScript developer. They may involve advanced algorithms, optimization, and require a strong understanding of JavaScript and programming concepts.',
-  }
+    easy: "Easy problems should be solvable in 10-15 minutes by a beginner to intermediate JavaScript developer. They should focus on basic programming concepts, data structures, and algorithms without requiring advanced knowledge or complex logic.",
+    medium:
+      "Medium problems should be solvable in 15-30 minutes by an intermediate JavaScript developer. They may involve more complex logic, multiple steps, and a deeper understanding of JavaScript features and data structures.",
+    hard: "Hard problems should be solvable in 30-60 minutes by an experienced JavaScript developer. They may involve advanced algorithms, optimization, and require a strong understanding of JavaScript and programming concepts.",
+  };
   const historyText =
     previousHistory.length > 0
-      ? JSON.stringify(
-          previousHistory,
-          null,
-          2
-        )
-      : 'No previous problems are available.';
+      ? JSON.stringify(previousHistory, null, 2)
+      : "No previous problems are available.";
 
   return `
 You are designing a coding exercise for a local
@@ -884,7 +751,9 @@ It may contain:
 
 It MUST export solve.
 
-${hints ? `
+${
+  hints
+    ? `
 HINT MODE IS ENABLED.
 
 Include useful inline hints in input.js.
@@ -901,14 +770,20 @@ Examples:
 // Hint: Consider whether the order of the values matters.
 
 Do NOT include the complete solution in the hints.
-` : `
+`
+    : `
 HINT MODE IS DISABLED.
 
 Do not include solution hints in input.js.
-`}
+`
+}
 
-${difficulty ? `the user has specified a difficulty level for this problem.
-DIFFICULTY: ${difficulty.toUpperCase()}  explanation: ${difficultyDefinitions[difficulty] || 'No explanation available.'}` : ''}
+${
+  difficulty
+    ? `the user has specified a difficulty level for this problem.
+DIFFICULTY: ${difficulty.toUpperCase()}  explanation: ${difficultyDefinitions[difficulty] || "No explanation available."}`
+    : ""
+}
 
 ==================================================
 TEST.JS
@@ -977,12 +852,16 @@ The JSON must contain exactly these fields:
 
 Do not use Markdown fences around the JSON.
 
-${process.env.THEME ? `
+${
+  process.env.THEME
+    ? `
 ==================================================
 THEME: ${process.env.THEME}
 ==================================================
 
-for a bit of fun the user has requested that the problem be themed around ${process.env.THEME}. please make sure the word problem associated with the code is themed around this topic` : ''}
+for a bit of fun the user has requested that the problem be themed around ${process.env.THEME}. please make sure the word problem associated with the code is themed around this topic`
+    : ""
+}
 `.trim();
 }
 
@@ -995,64 +874,46 @@ for a bit of fun the user has requested that the problem be themed around ${proc
 async function generateProblem(hints, difficulty) {
   ensureDirectories();
 
-  const history =
-    loadTodayHistory();
-  console.log('');
-  console.log(
-    'Generating a new coding exercise...'
-  );
+  const history = loadTodayHistory();
+  console.log("");
+  console.log("Generating a new coding exercise...");
 
-  console.log(
-    hints
-      ? 'Hints: enabled'
-      : 'Hints: disabled'
-  );
+  console.log(hints ? "Hints: enabled" : "Hints: disabled");
 
-  const response =
-    await client.responses.create({
-      model: 'gpt-5.6-luna',
-      input: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'input_text',
-              text:
-                buildGenerationPrompt({
-                  hints,
-                  difficulty,
-                  previousHistory:
-                    history.problems.slice(-10),
-                }),
-            },
-          ],
-        },
-      ],
-    });
+  const response = await client.responses.create({
+    model: "gpt-5.6-luna",
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: buildGenerationPrompt({
+              hints,
+              difficulty,
+              previousHistory: history.problems.slice(-10),
+            }),
+          },
+        ],
+      },
+    ],
+  });
 
-  const generated =
-    validateGeneratedProblem(
-      extractJson(
-        response.output_text
-      )
-    );
+  const generated = validateGeneratedProblem(extractJson(response.output_text));
 
-  const validation =
-    validateGeneratedProblemCompletely(
-      generated
-    );
+  const validation = validateGeneratedProblemCompletely(generated);
 
   if (!validation.valid) {
     cleanupAfterGeneration();
 
     throw new Error(
       [
-        'AI generated an invalid exercise.',
-        '',
+        "AI generated an invalid exercise.",
+        "",
         validation.reason,
-        '',
+        "",
         validation.output,
-      ].join('\n')
+      ].join("\n"),
     );
   }
 
@@ -1061,9 +922,7 @@ async function generateProblem(hints, difficulty) {
    *
    * Now write the user-facing files.
    */
-  writeGeneratedFiles(
-    generated
-  );
+  writeGeneratedFiles(generated);
 
   cleanupAfterGeneration();
 
@@ -1072,8 +931,7 @@ async function generateProblem(hints, difficulty) {
   /*
    * Record the problem.
    */
-  const newHistory =
-    loadTodayHistory();
+  const newHistory = loadTodayHistory();
 
   newHistory.problems.push({
     id: generated.problemId,
@@ -1082,46 +940,27 @@ async function generateProblem(hints, difficulty) {
     explanation: generated.problem,
     attempts: 0,
     succeeded: false,
-    generatedAt:
-      new Date().toISOString(),
+    generatedAt: new Date().toISOString(),
   });
 
-  saveTodayHistory(
-    newHistory
-  );
+  saveTodayHistory(newHistory);
 
-  console.log('');
-  console.log('================================');
-  console.log('   Coding exercise generated!');
-  console.log('================================');
-  console.log('');
-  console.log(
-    `Title:      ${generated.title}`
-  );
-  console.log(
-    `Difficulty: ${generated.difficulty}`
-  );
-  console.log('');
-  console.log(
-    'Files created:'
-  );
-  console.log(
-    `  ${PROBLEM_FILE}`
-  );
-  console.log(
-    `  ${INPUT_FILE}`
-  );
-  console.log(
-    `  ${TEST_FILE}`
-  );
-  console.log('');
-  console.log(
-    'Start solving with:'
-  );
-  console.log(
-    '  npm run gym:solve'
-  );
-  console.log('');
+  console.log("");
+  console.log("================================");
+  console.log("   Coding exercise generated!");
+  console.log("================================");
+  console.log("");
+  console.log(`Title:      ${generated.title}`);
+  console.log(`Difficulty: ${generated.difficulty}`);
+  console.log("");
+  console.log("Files created:");
+  console.log(`  ${PROBLEM_FILE}`);
+  console.log(`  ${INPUT_FILE}`);
+  console.log(`  ${TEST_FILE}`);
+  console.log("");
+  console.log("Start solving with:");
+  console.log("  npm run gym:solve");
+  console.log("");
 }
 
 /*
@@ -1144,23 +983,11 @@ function getCurrentProblem() {
   }
 
   return {
-    problem:
-      fs.readFileSync(
-        PROBLEM_FILE,
-        'utf8'
-      ).trim(),
+    problem: fs.readFileSync(PROBLEM_FILE, "utf8").trim(),
 
-    input:
-      fs.readFileSync(
-        INPUT_FILE,
-        'utf8'
-      ),
+    input: fs.readFileSync(INPUT_FILE, "utf8"),
 
-    test:
-      fs.readFileSync(
-        TEST_FILE,
-        'utf8'
-      ),
+    test: fs.readFileSync(TEST_FILE, "utf8"),
   };
 }
 
@@ -1172,32 +999,22 @@ function getCurrentProblem() {
 
 function runCurrentTests() {
   if (!currentProblemExists()) {
-    console.error(
-      'No coding problem exists yet.'
-    );
+    console.error("No coding problem exists yet.");
 
-    console.error(
-      'Run "npm run gym" first.'
-    );
+    console.error('Run "npm run gym" first.');
 
     return false;
   }
 
-  console.log('');
-  console.log(
-    'Running coding-gym tests...'
-  );
-  console.log('');
+  console.log("");
+  console.log("Running coding-gym tests...");
+  console.log("");
 
-  const result =
-    runNodeTests(TEST_FILE);
+  const result = runNodeTests(TEST_FILE);
 
-  process.stdout.write(
-    result.output
-  );
+  process.stdout.write(result.output);
 
-  const succeeded =
-    result.passed;
+  const succeeded = result.passed;
 
   updateCurrentProblemHistory({
     succeeded,
@@ -1213,49 +1030,37 @@ function runCurrentTests() {
 */
 
 function getLatestProblemHistory() {
-  const history =
-    loadTodayHistory();
+  const history = loadTodayHistory();
 
-  if (
-    !history.problems ||
-    history.problems.length === 0
-  ) {
+  if (!history.problems || history.problems.length === 0) {
     return null;
   }
 
-  return history.problems[
-    history.problems.length - 1
-  ];
+  return history.problems[history.problems.length - 1];
 }
 
 function updateCurrentProblemHistory({ succeeded }) {
   const history = loadTodayHistory();
 
-  if (
-    !history.problems ||
-    history.problems.length === 0
-  ) {
+  if (!history.problems || history.problems.length === 0) {
     return;
   }
 
   // The last problem in today's history is the
   // problem currently being worked on.
-  const currentProblem =
-    history.problems[history.problems.length - 1];
+  const currentProblem = history.problems[history.problems.length - 1];
 
   if (!currentProblem) {
     return;
   }
 
-  currentProblem.attempts =
-    Number(currentProblem.attempts || 0) + 1;
+  currentProblem.attempts = Number(currentProblem.attempts || 0) + 1;
 
   if (succeeded) {
     currentProblem.succeeded = true;
 
     if (!currentProblem.completedAt) {
-      currentProblem.completedAt =
-        new Date().toISOString();
+      currentProblem.completedAt = new Date().toISOString();
     }
   }
 
@@ -1270,98 +1075,99 @@ function updateCurrentProblemHistory({ succeeded }) {
 
 async function solveMode() {
   if (!currentProblemExists()) {
-    console.error(
-      'No coding problem exists yet.'
-    );
+    console.error("No coding problem exists yet.");
 
-    console.error(
-      'Run "npm run gym" first.'
-    );
+    console.error('Run "npm run gym" first.');
 
     return;
   }
 
-  console.log('');
-  console.log(
-    '================================'
-  );
-  console.log(
-    '          Coding Gym'
-  );
-  console.log(
-    '================================'
-  );
-  console.log('');
+  console.log("");
+  console.log("================================");
+  console.log("          Coding Gym");
+  console.log("================================");
+  console.log("");
 
-  console.log(
-    `Problem: ${PROBLEM_FILE}`
-  );
+  console.log(`Problem: ${PROBLEM_FILE}`);
 
-  console.log(
-    `Input:   ${INPUT_FILE}`
-  );
+  console.log(`Input:   ${INPUT_FILE}`);
 
-  console.log(
-    `Tests:   ${TEST_FILE}`
-  );
+  console.log(`Tests:   ${TEST_FILE}`);
 
-  console.log('');
+  console.log("");
 
-  console.log(
-    'Edit input.js, then press Enter'
-  );
+  console.log("Edit input.js, then press Enter");
 
-  console.log(
-    'to run the tests.'
-  );
+  console.log("to run the tests.");
 
-  console.log(
-    'Type "quit" to exit.'
-  );
+  console.log('Type "quit" to exit.');
 
-  console.log('');
+  console.log("type 'HELP' for hints.");
+
+  console.log("");
 
   while (true) {
-    const answer =
-      await askQuestion('> ');
+    const answer = await askQuestion("> ");
 
-    if (
-      answer.trim().toLowerCase() ===
-      'quit'
-    ) {
+    if (answer.trim().toLowerCase() === "quit") {
       break;
     }
 
-    const succeeded =
-      runCurrentTests();
+    if (answer.trim().toLowerCase() === "help") {
+      const currentProblem = getCurrentProblem();
 
-    console.log('');
+      if (!currentProblem) {
+        console.error("No coding problem exists yet.");
+
+        console.error('Run "npm run gym" first.');
+
+        return;
+      }
+
+      const hints = await client.responses.create({
+        model: "gpt-5.6-luna",
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: `The user is working on a coding exercise. The user has the following input.js:\n\n${currentProblem.input}\n\nThe user has the following test.js:\n\n${currentProblem.test}\n\nPlease provide 1 to 3 hints to help the user solve the problem. The hints should be concise and helpful, but not give away the complete solution. The hints should be in plain text format.`,
+              },
+            ],
+          },
+        ],
+      });
+
+      console.log(currentProblem.input);
+
+      console.log("");
+      console.log("Hints:");
+      console.log(hints.output_text);
+      console.log("");
+
+      continue;
+    }
+
+    const succeeded = runCurrentTests();
+
+    console.log("");
 
     if (succeeded) {
-      console.log(
-        '🎉 Problem solved!'
-      );
+      console.log("🎉 Problem solved!");
 
-      console.log('');
-      console.log(
-        'Your result has been recorded'
-      );
-      console.log(
-        'in today\'s history file.'
-      );
+      console.log("");
+      console.log("Your result has been recorded");
+      console.log("in today's history file.");
 
       break;
     }
 
-    console.log(
-      'Keep working on input.js.'
-    );
+    console.log("Keep working on input.js.");
 
-    console.log(
-      'Press Enter to test again.'
-    );
+    console.log("Press Enter to test again.");
 
-    console.log('');
+    console.log("");
   }
 }
 
@@ -1373,21 +1179,14 @@ async function solveMode() {
 
 function showProblem() {
   if (!fs.existsSync(PROBLEM_FILE)) {
-    console.log(
-      'No problem has been generated yet.'
-    );
+    console.log("No problem has been generated yet.");
 
     return;
   }
 
-  console.log('');
-  console.log(
-    fs.readFileSync(
-      PROBLEM_FILE,
-      'utf8'
-    )
-  );
-  console.log('');
+  console.log("");
+  console.log(fs.readFileSync(PROBLEM_FILE, "utf8"));
+  console.log("");
 }
 
 /*
@@ -1397,60 +1196,45 @@ function showProblem() {
 */
 
 async function main() {
-  const command =
-    process.argv[2];
+  const command = process.argv[2];
 
-  if (
-    command === 'help' ||
-    command === '--help' ||
-    command === '-h'
-  ) {
+  if (command === "help" || command === "--help" || command === "-h") {
     printUsage();
     return;
   }
 
-  if (
-    command === 'test' ||
-    command === '--test'
-  ) {
+  if (command === "test" || command === "--test") {
     runCurrentTests();
     return;
   }
 
-  if (
-    command === 'solve' ||
-    command === '--solve'
-  ) {
+  if (command === "solve" || command === "--solve") {
     await solveMode();
     return;
   }
 
-  if (command === 'show') {
+  if (command === "show") {
     showProblem();
     return;
   }
 
-  const hints =
-    hasFlag('--hints');
+  const hints = hasFlag("--hints");
 
   if (
     command === undefined ||
-    command === 'generate' ||
-    command === '--generate' ||
-    command === '--hints'
+    command === "generate" ||
+    command === "--generate" ||
+    command === "--hints"
   ) {
     let difficulty = null;
-    let hints = hasFlag('--hints');
-    
-    if (!hasFlag('--no-prompt')) {
+    let hints = hasFlag("--hints");
+
+    if (!hasFlag("--no-prompt")) {
       difficulty = await askDifficulty();
       hints = await askHints();
     }
 
-    await generateProblem(
-      hints,
-      difficulty
-    );
+    await generateProblem(hints, difficulty);
 
     return;
   }
@@ -1459,15 +1243,10 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('');
-  console.error(
-    'Coding Gym Error:'
-  );
-  console.error('');
-  console.error(
-    error.message
-  );
+  console.error("");
+  console.error("Coding Gym Error:");
+  console.error("");
+  console.error(error.message);
 
   process.exitCode = 1;
-
 });
